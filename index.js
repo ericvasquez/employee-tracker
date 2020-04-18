@@ -4,7 +4,7 @@ var connection = mysql.createConnection({
 host: "localhost",
 port: 3306,
 user: "root",
-password: "IRLYH8kat33**",
+password: "",
 database: "employee_db"
 });
 connection.connect(function(err) {
@@ -12,56 +12,68 @@ if (err) throw err;
   start();
 });
 function start() {
-inquirer
-    .prompt({
-name: "action",
+inquirer.prompt({
+name: "choice",
 type: "list",
 message: "What do you want to do?",
-choices: ["Add Department", "Add Role", "Add Employee", "View All Departments", "View All Roles", "View All Employees", "Update Employee's Role"]
-})
-.then(function(answer) {
-      if (answer.action === "Add Department") {
-addDepartment();
+choices: [
+{
+    name: "Add Department",
+},
+{
+    name: "Add Role",
+},
+{
+    name: "Add Employee",
+},
+{
+    name: "View All Departments",
+},
+{
+    name: "View All Roles",
+},
+{
+    name: "View All Employees",
+},
+{
+    name: "Update Employee's Role"
 }
-else if (answer.action === "Add Role") {
-    addRole();
+]
+}).then(function(answer) {
+    switch(answer.choice){
+        case "Add Department":
+            return addDepartment();
+        case "Add Role":
+            return addRole();
+        case "Add Employee":
+            return addEmployee();
+        case "View All Departments":
+            return viewAllDepartments();
+        case "View All Roles":
+            return viewAllRoles();
+        case "View All Employees":
+            return viewAllEmployees();
+        case "Update Employee's Role":
+            return updateEmployeeRole();
+        default:
+            return connection.end();
     }
-else if (answer.action === "Add Employee") {
-        addEmployee();
-        }
-else if(answer.action === "View All Departments") {
-viewAllDepartments();
-} 
-else if(answer.action === "View All Roles") {
-    viewAllRoles();
-    } 
-else if(answer.action === "View All Employees") {
-        viewAllEmployees();
-        } 
-        else if(answer.action === "Update Employee's Role") {
-            updateEmployeeRole();
-            } 
-else{
-connection.end();
-}
 });
 }
 
 function addDepartment() {
-  inquirer
-    .prompt([
-{name: "name",
+  inquirer.prompt([
+{
+name: "name",
 type: "input",
 message: "What is the new department name?"
-      },
-])
-.then(function(answer) {
-      connection.query(
-"INSERT INTO department SET ?",
+}
+]).then(function(answer){
+      connection.query("INSERT INTO department SET ?",
 {
 name: answer.name,
-        },
-        function(err) {
+},
+function(err) {
 if (err) throw err;
 console.log("Your department was created successfully!");
           start();
@@ -71,17 +83,17 @@ console.log("Your department was created successfully!");
 }
 
 function addRole() {
-    inquirer
-      .prompt([
-  {name: "title",
+ inquirer.prompt([
+  {
+      name: "title",
   type: "input",
   message: "What role do you want to add?"
-        },
-        {
+},
+{
   name: "salary",
   type: "input",
   message: "What is the salary?"
-        },
+    },
         {
   name: "department_id",
   type: "input",
@@ -95,13 +107,12 @@ function addRole() {
   }
   ])
   .then(function(answer) {
-        connection.query(
-  "INSERT INTO role SET ?",
+        connection.query("INSERT INTO role SET ?",
   {
   title: answer.title,
   salary: answer.salary,
   department_id: answer.department_id
-          },
+    },
           function(err) {
   if (err) throw err;
   console.log("Your new role was created successfully!");
@@ -112,8 +123,7 @@ function addRole() {
   }
 
   function addEmployee() {
-    inquirer
-      .prompt([
+    inquirer.prompt([
   {name: "first_name",
   type: "input",
   message: "What is the first name?"
@@ -217,7 +227,6 @@ function viewAllDepartments() {
               chosenEmployee = results[i];
             }
           }
-
             connection.query(
               "UPDATE employee SET ? WHERE ?",
               [
